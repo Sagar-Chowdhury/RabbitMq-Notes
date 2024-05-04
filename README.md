@@ -183,31 +183,97 @@ amqp.connect("amqp://localhost",function(error0,connection){
 (`work-consumer.js`)
 
 ```JavaScript
-const amqp = require("amqplib/callback_api")
+const amqp = require("amqplib/callback_api");
 
-amqp.connect("amqp://localhost",function(error0,connection){
-    if(error0)throw error0;
-    
-    connection.createChannel(function(error1,channel){
-        if(error1) throw error1
+amqp.connect("amqp://localhost", function (error0, connection) {
+  if (error0) throw error0;
 
-        var queue = "task_queue"
-        
-        // Simulate multiple tasks
-        for(var i=1;i<=20;i++){
-            var msg = "Task number"+i
-            channel.sendToQueue(queue,Buffer.from(msg))
-            console.log(" [x] Sent %s",msg)
-        }
-        
-        setTimeout(function(){
-           connection.close()
-           process.exit(0) 
-        },500)
+  connection.createChannel(function (error1, channel) {
+    if (error1) throw error1;
 
-    })
+    var queue = "task_queue";
 
-})
+    channel.assertQueue(queue, {
+      durable: false,
+    });
+
+    channel.consume(queue, function (msg) {
+      console.log("[x] Received %s", msg);
+
+      // Simulate processing time
+      setTimeout(function () {
+        console.log(" [x] Done", msg.content.toString());
+        channel.ack(msg); // Acknowledge the message after processing
+      }, 1000),
+        {
+          // Prefetch count: Limit the number of unacknowledged messages per worker
+          prefetch: 1,
+        };
+    });
+  });
+});
+
+```
+
+**Explanation**
+
+* **task-queue-producer.js**:
+    * Connects to RabbitMQ.
+    * Creates a channel and defines a queue named "task_queue".
+    * Sends 10 messages (simulating tasks) to the queue.
+    * Closes the connection after sending messages.
+
+* **work-consumer.js**:
+    * Connects to RabbitMQ.
+    * Creates a channel and asserts the "task_queue".
+    * Defines a consumer that listens for messages on the queue.
+    * When a message arrives:
+        * Logs the message content (task).
+        * Simulates processing time (replace with your actual work).
+        * Logs completion and acknowledges the message with `channel.ack(msg)`. Unacknowledged messages might be redelivered if a worker crashes.
+    * Sets `prefetch: 1` to ensure only one unacknowledged message is delivered to the worker at a time.
+
+
+
+**Key Concepts**
+
+**Round-robin dispatching** :- By default, RabbitMQ will send each message to the next consumer, in sequence. On average every consumer will get the same number of messages. This way of distributing messages is called round-robin.
+
+**Message Acknowledgement** :- 
+
+In order to make *sure a message is never lost*, RabbitMQ supports message acknowledgments. *An ack(nowledgement) is sent back by the consumer* to tell RabbitMQ that a particular message has been received, processed and that RabbitMQ is *free to delete it*.
+
+If a consumer dies (its channel is closed, connection is closed, or TCP connection is lost) without *sending an ack*, RabbitMQ will understand that a message wasn't processed fully and *will re-queue it*. If there are other consumers online at the same time, it will then quickly redeliver it to another consumer. That way you can be sure that no message is lost, even if the workers occasionally die.
+
+```JavaScript
+channel.consume(queue, function(msg) {
+  var secs = msg.content.toString().split('.').length - 1;
+
+  console.log(" [x] Received %s", msg.content.toString());
+  setTimeout(function() {
+    console.log(" [x] Done");
+    channel.ack(msg);
+  }, secs * 1000);
+  }, {
+    // manual acknowledgment mode,
+    // see /docs/confirms for details
+    noAck: false
+  });
+
+```
+Using this code, you can ensure that even if you terminate a worker using CTRL+C while it was processing a message, *nothing is lost*. Soon after the worker terminates, all unacknowledged messages are delivered.
+
+**Message Durability**
+
+We have learned how to make sure that even if the consumer dies, the task isn't lost. But our tasks will **still be lost if RabbitMQ server stops**.
+
+When RabbitMQ quits or crashes it will forget the queues and messages unless you tell it not to. Two things are required to make sure that messages aren't lost: we need to mark both the queue and messages as durable.
+
+```JavaScript
+channel.assertQueue('task_queue', {durable: true});
+```
+```JS
+channel.sendToQueue(queue, Buffer.from(msg), {persistent: true});
 ```
 
 
