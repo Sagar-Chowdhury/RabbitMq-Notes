@@ -20,6 +20,7 @@
 4. **Exchanges:**  Entry points for messages coming from producers. Exchanges route messages to appropriate queues based on rules called bindings.
 5. **Bindings:**  Associations between exchanges and queues that establish the routing logic.
 6. **Routing Key:** A piece of data included in a message sent by a producer. The exchange uses this routing key, along with bindings, to determine where to send the message.
+7. **V-Host:** Vhosts (Virtual Hosts) in RabbitMQ provides a way to segregate applications using the same RabbitMQ instance. RabbitMQ vhosts creates a logical group of connections, exchanges, queues, bindings, user permissions, etc. within an instance.
 
 **Messaging Patterns**
 
