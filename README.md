@@ -288,6 +288,98 @@ This happens because *RabbitMQ just dispatches a message when the message enters
 
 To defeat that we can use the prefetch method with the value of 1. This tells RabbitMQ **not to give more than one message to a worker at a time**. Or, in other words, don't dispatch a new message to a worker until it has processed and acknowledged the previous one. Instead, it will dispatch it to the next worker that is not still busy.
 
+### Exchanges
+
+Basic **Fanout** Exchange. (`Broadcasting to all Consumers`) 
+
+(`emit-log-producer.js`)
+
+```JS
+var amqp = require("amqplib/callback_api");
+
+amqp.connect("amqp://localhost", function (error0, connection) {
+  if (error0) throw error0;
+
+  connection.createChannel(function (error1, channel) {
+    if (error1) throw error1;
+
+    var exchange = "logs";
+    var msg = "Message Sent Via Exchange";
+
+    channel.assertExchange(exchange, "fanout", {
+      durable: false,
+    });
+   
+    for(var i=1;i<=50;i++){
+    channel.publish(exchange, "", Buffer.from(msg));
+    console.log("[x] Sent %s", msg);
+    }
+  });
+
+
+  setTimeout(function () {
+    connection.close();
+    process.exit(0);
+  }, 500);
+});
+
+```
+
+(`receive-log-consumer.js`)
+
+```JS
+var amqp = require("amqplib/callback_api");
+
+amqp.connect("amqp://localhost", function (error0, connection) {
+  if (error0) {
+    throw error0;
+  }
+  connection.createChannel(function (error1, channel) {
+    if (error1) {
+      throw error1;
+    }
+    var exchange = "logs";
+
+    channel.assertExchange(exchange, "fanout", {
+      durable: false,
+    });
+
+    channel.assertQueue(
+      "",
+      {
+        exclusive: true,
+      },
+      function (error2, q) {
+        if (error2) {
+          throw error2;
+        }
+        console.log(
+          " [*] Waiting for messages in %s. To exit press CTRL+C",
+          q.queue
+        );
+        channel.bindQueue(q.queue, exchange, "");
+
+        channel.consume(
+          q.queue,
+          function (msg) {
+            if (msg.content) {
+              console.log(" [x] %s", msg.content.toString());
+            }
+          },
+          {
+            noAck: true,
+          }
+        );
+      }
+    );
+  });
+});
+
+```
+
+(`Output Illustration`)
+
+![image](https://github.com/Sagar-Chowdhury/RabbitMq-Notes/assets/76145064/91ec6589-4f61-404d-b3f4-d0ca49bec795)
 
 
 
