@@ -4,6 +4,10 @@
 
 **What is RabbitMQ?**
 
+(`Overall Architecture`)
+![image](https://github.com/Sagar-Chowdhury/RabbitMq-Notes/assets/76145064/09b156f9-d671-4eff-99d5-d61c54bfc8d4)
+
+
 * **Message Broker:** RabbitMQ is a robust, open-source message broker that acts as a central hub for asynchronous communication between applications. 
 * **Message Queuing:** At its core, it stores and forwards messages ensuring reliable delivery, even if parts of your system temporarily fail.
 * **AMQP:**  RabbitMQ primarily implements the Advanced Message Queuing Protocol (AMQP), an industry standard for message-oriented middleware, providing high compatibility with various technologies. However, it supports other protocols like MQTT and STOMP.
