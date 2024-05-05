@@ -290,6 +290,11 @@ To defeat that we can use the prefetch method with the value of 1. This tells Ra
 
 ### Exchanges
 
+An exchange is a very simple thing. On one side it *receives messages from producers* and the other side it *pushes them to queues*. The exchange must know exactly what to *do with a message it receives*. Should it be appended to a particular queue? Should it be appended to many queues? Or should it get discarded. The rules for that are defined by the exchange type.
+
+![image](https://github.com/Sagar-Chowdhury/RabbitMq-Notes/assets/76145064/86304d40-bae3-474a-8917-07631d21dcdc)
+
+
 Basic **Fanout** Exchange. (`Broadcasting to all Consumers`) 
 
 (`emit-log-producer.js`)
@@ -377,9 +382,34 @@ amqp.connect("amqp://localhost", function (error0, connection) {
 
 ```
 
+***Points to Note***
+
+   ```JS
+   channel.publish('logs', '', Buffer.from('Hello World!'));
+   ```
+The empty string as second parameter means that we don't want to send the message to *any specific queue*. We want only to publish it to our 'logs' exchange.     
+```JS
+channel.assertQueue('', {
+  exclusive: true
+});
+```
+
+The empty string as second parameter means that we don't want to send the message to *any specific queue*. We want only to publish it to our 'logs' exchange.
+Giving a queue a *name is important when you want to share the queue between producers and consumers*.
+But that's not the case for our logger. We want to hear about all log messages, not just a subset of them. We're also interested only in currently flowing messages 
+not in the old ones. To solve that we need two things.
+
+
+*Randomly generated queue-names*
+
+![image](https://github.com/Sagar-Chowdhury/RabbitMq-Notes/assets/76145064/599a7302-3c86-47b7-b5f8-59e16a553a1e)
+
+
+
 (`Output Illustration`)
 
 ![image](https://github.com/Sagar-Chowdhury/RabbitMq-Notes/assets/76145064/91ec6589-4f61-404d-b3f4-d0ca49bec795)
+
 
 
 
