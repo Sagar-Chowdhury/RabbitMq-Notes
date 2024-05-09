@@ -411,9 +411,62 @@ not in the old ones. To solve that we need two things.
 
 
 
-(`Output Illustration`)
+(`Output Illustration` - ` A Typical Fanout Exchange`)
 
 ![image](https://github.com/Sagar-Chowdhury/RabbitMq-Notes/assets/76145064/91ec6589-4f61-404d-b3f4-d0ca49bec795)
+
+**Exchange Types**
+
+In RabbitMQ there are four main types of Exchanges:
+
+Direct
+Topic
+Fanout
+Headers
+
+**Taxi Company Example: RabbitMQ Exchange Types**
+
+**Direct Exchange**
+
+* **Purpose:** Assigning specific taxi requests where the user wants a particular driver by preference.
+* **Routing Logic:** Exact matches between the message's routing key and a queue's binding key.
+* **Example:**
+    * **Routing key:** "driver-id-1234" 
+    * **Queue:** Bound to "driver-id-1234"
+    * **Message:** Ride request for driver with ID 1234
+
+**Topic Exchange**
+
+* **Purpose:** Routing ride requests based on taxi attributes or customer preferences. 
+* **Routing Logic:** Pattern matching between message's routing key and queues' binding keys. Uses '*' (match a single word) and '#' (match zero or more words).
+* **Example 1 (Environmental Taxi):**
+    * **Routing key:** "vehicle.large.eco"
+    * **Queues:** 
+         * Bound to "vehicle.large.eco" (exact match)
+         * Bound to "vehicle.large.*" (all large vehicles) 
+* **Example 2 (Large Taxi, Any Type):**
+    * **Routing key:** "vehicle.large"
+    * **Queues:** Bound to "vehicle.large.*" 
+
+**Fanout Exchange**
+
+* **Purpose:** Broadcast-style messages to all taxis. 
+* **Routing Logic:** Ignores routing keys; sends copies of the message to all bound queues.
+* **Example:**
+    * **Routing key:** (Not relevant)
+    * **Queues:** All taxi driver queues
+    * **Message:** Urgent traffic alert about a road closure
+
+**Headers Exchange**
+
+* **Purpose:** Filtering messages based on message headers rather than simple routing keys. Allows for more complex routing scenarios.
+* **Routing Logic:** Matches messages based on header values (key-value pairs)
+* **Example:**
+    * **Header:**  "priority" : "high"
+    * **Queues:** Bound to headers with "priority" set to "high"
+    * **Message:** High-paying ride opportunity 
+
+
 
 
 
