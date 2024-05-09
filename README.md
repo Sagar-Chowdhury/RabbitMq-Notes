@@ -467,6 +467,36 @@ Headers
     * **Message:** High-paying ride opportunity 
 
 
+**Virtual Hosts (vhosts) in RabbitMQ**
+
+* **Purpose:**  Provide logical segregation of applications using the same RabbitMQ instance.
+
+* **Concept:** Think of vhosts as mini-RabbitMQ servers within a single instance. Each vhost has its own:
+    * Connections
+    * Exchanges
+    * Queues
+    * Bindings
+    * User permissions
+
+* **Client Connection:** When a client connects to RabbitMQ, it specifies the target vhost.
+
+* **Isolation:** Resources are not shared between vhosts, ensuring separation.
+
+* **Creation:** Vhosts can be created via:
+    * Management portal
+    * HTTP API
+    * `rabbitmqctl` command
+
+* **Default vhost:** A default vhost (named "/") exists upon installation.
+
+**Benefits of Using Vhosts**
+
+* **Application Separation:** Isolate different applications on the same RabbitMQ broker.
+* **Environment Management:** Create separate vhosts for production, staging, etc.
+* **Improved Security:** Enforce granular user permissions per vhost.
+* **Resource Management:** Manage the topology and resource usage of individual services.
+
+**Important Note:** While vhosts offer logical separation, performance of one vhost can potentially impact others since they share the same physical resources. 
 
 
 
