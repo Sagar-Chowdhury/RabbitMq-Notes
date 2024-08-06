@@ -499,6 +499,113 @@ Headers
 **Important Note:** While vhosts offer logical separation, performance of one vhost can potentially impact others since they share the same physical resources. 
 
 
+# The Management Interface
+
+# The Overview
+
+Let's enter the first view, The Overview, it gives a quick and easy to understand snapshot of the RabbitMQ state.
+
+![Screenshot of the RabbitMQ Management interface overview](https://training.cloudamqp.com/images/image20.png)
+
+The overview shows two charts, one for queued messages and one with the message rate. You can change the time interval shown in the chart by pressing the text _(chart: last minute)_ above the charts. Information about all different statuses for messages can be found by pressing the question mark (?).
+
+Queued messages show a chart of the total number of queued messages for all your queues. Ready shows the number of messages that are available to be delivered. Unacked are the number of messages for which the server is waiting for an acknowledgment.
+
+The Message rates chart shows the rate of how fast the messages are handled. Publish shows the rate at which messages are entering the server and Confirm shows the rate at which the server is confirming.
+
+Global Count shows the total number of connections, channels, exchanges, queues, and consumers for ALL virtual hosts the current user has access to.
+
+## Nodes
+
+A cluster in RabbitMQ can include one or several nodes (servers). The Nodes view show information about the different nodes in the RabbitMQ cluster. This is where to find information about server memory, the number of Erlang processes per node, and other node-specific information. Info shows further information about the node and enabled plugins.
+
+## Churn Rate
+
+Connection/channel opening/closure rates are important metrics of the system that should be monitored. High connection and channel churn might lead to node exhaustion of resources.
+
+![Screenshot of the RabbitMQ Management interface overview: churn statistics tab](https://training.cloudamqp.com/images/image21.png)
+
+## Ports and Contexts
+
+Listening ports for different protocols can be found below Ports and contexts, as shown in the image above.
+
+## Export and Import Definitions
+
+It is possible to import and export configuration definitions. When you download the definitions file, you get a JSON representation of your broker, your RabbitMQ settings. This can be used to restore exchanges, queues, virtual hosts, policies, and users. This feature can be used as a backup. Every time you make a change in the config, you can keep the old settings just in case.
+
+![Screenshot of the RabbitMQ Management interface overview: export- and import definitions tabs](https://training.cloudamqp.com/images/image22.png)
+
+
+# Connections and Channels
+
+RabbitMQ connections and channels can be in different states:
+
+- Starting
+- Tuning
+- Opening
+- Running
+- Flow
+- Blocking
+- Blocked
+- Closing
+- Closed
+
+The "flow" state is an indication that the publishing rate has been restricted, to prevent RabbitMQ from running out of memory. This happens automatically if RabbitMQ detects a connection which is publishing too quickly for a queue to keep up. A flow-controlled connection will block and unblock several times per second in order to maintain a rate that the server can handle.
+
+The connection tab shows the connections established to the RabbitMQ server. **vhost** shows in which vhost the connection operates. The **username** shows the user associated with the connection. **Channels** tell the number of channels using the connection. **SSL/TLS** indicates whether the connection is secured with SSL.
+
+If you click on one of the connections, you get an overview of that specific connection. You can view channels in the connection and data rates. You can see client properties and you can close the connection.
+
+![Screenshot of the RabbitMQ Management interface connections view](https://training.cloudamqp.com/images/image23.png)
+
+More information about the attributes associated with a connection can be found on the manual page for rabbitmqctl, the command-line tool for managing a RabbitMQ broker.
+
+## Channels
+
+**The channel tab shows** information about all current channels. The **vhost** shows in which vhost the channel operates and the **username** of the user associated with the channel. The **mode** displays the channel guarantee mode.
+
+![Screenshot of the RabbitMQ Management interface channels view](https://training.cloudamqp.com/images/image24.png)
+
+If you click on one of the channels, you get a detailed overview of that specific channel. From here you can view the message rate on the number of logical consumers retrieving messages via the channel.
+
+# Exchanges
+
+All exchanges can be listed from the exchange tab. **Virtual host** shows the vhost for the exchange, **type** is the exchange type such as direct, topic, headers, fanout. **Features** show the parameters for the exchange (i.e. D stands for durable, and AD for auto-delete). Features and types can be specified when the exchange is created. In this list, there are some amq.* exchanges and the default (unnamed) exchange, which are created by default.
+
+![Screenshot of the RabbitMQ Management interface exchanges view](https://training.cloudamqp.com/images/image25.png)
+
+By clicking on the exchange name, a detailed page about the exchange is shown. You can see and add bindings to the exchange, and you can publish a message to the exchange or delete the exchange.
+
+![Screenshot of the RabbitMQ Management interface exchange details view](https://training.cloudamqp.com/images/image26.png)
+
+
+# Queues and Bindings
+
+The Queues tab shows the queues for all or one selected vhost.
+
+Queues have different parameters and arguments depending on how they were created. The _features_ column shows the parameters that belong to the queue. It could be features like _Durable queue_ (which ensure that RabbitMQ will never lose the queue), _Message TTL_ (which tells how long a message published to a queue can live before it is discarded), _Auto expire_ (which tells how long a queue can be unused for before it is automatically deleted), _Max length_ (which tells how many (ready) messages a queue can contain before it starts to drop them) and _Max length bytes_ (which tells the total body size for ready messages a queue can contain before it starts to drop them).
+
+![Screenshot of the RabbitMQ Management interface queues view](https://training.cloudamqp.com/images/image27.png)
+
+You can also create a queue from this view.
+
+If you press on any chosen queue from the list of queues, all information about the queue is shown.
+
+![Screenshot of the RabbitMQ Management interface queue details view](https://training.cloudamqp.com/images/image28.png)
+
+The first two charts include the same information as the overview, but it just shows the number of queued messages and the message rates for that specific queue.
+
+Consumers show the consumers/channels that are connected to the queue.
+
+## Bindings
+
+A binding can be created between an exchange and a queue. All active bindings to the queue are shown under bindings. You can also create a new binding to a queue from here or unbind a queue from an exchange.
+
+![Screenshot of the RabbitMQ Management interface queue details view, with the Bindings tab open](https://training.cloudamqp.com/images/image29.png)
+
+
+
+
 
 
 
