@@ -605,6 +605,28 @@ A binding can be created between an exchange and a queue. All active bindings to
 
 
 
+### Queue Types
+
+Here’s a detailed comparison chart of the main types of queues in RabbitMQ:
+
+| **Queue Type**      | **Definition**                                                                                  | **Usage**                                         | **Durability**         | **Message Ordering**            | **TTL (Time to Live)**  | **Dead-Lettering**                         | **Auto Delete** | **Exclusive** |
+|---------------------|------------------------------------------------------------------------------------------------|--------------------------------------------------|------------------------|---------------------------------|-------------------------|------------------------------------------------|----------------|---------------|
+| **Classic Queue**    | The default queue type in RabbitMQ. Stores messages in memory or on disk.                      | General purpose queuing. Most widely used.        | Supports durable queues | FIFO (First In, First Out)      | Supports per-message and per-queue TTLs | Supports dead-lettering to other queues | Optional       | Optional      |
+| **Quorum Queue**     | Replicated queues for high availability and consistency.                                        | Use when consistency and high availability matter | Durable only            | FIFO                             | Supports TTLs           | Supports dead-lettering to other queues     | No             | No            |
+| **Stream Queue**     | Optimized for high throughput and message streaming use cases.                                 | High throughput, log-like data stream processing | Persistent              | FIFO with non-destructive consuming | Supports per-message TTLs | Can use dead-letter exchange for non-consumed messages | No             | No            |
+| **Priority Queue**   | Allows messages with different priorities to be processed accordingly.                         | Use when certain messages need higher priority.  | Supports durable queues | Higher-priority messages are delivered first | Supports TTLs | Supports dead-lettering to other queues     | Optional       | Optional      |
+| **Lazy Queue**       | Stores all messages on disk, only loading them into memory when necessary.                     | When dealing with large queues and limited memory | Durable only            | FIFO                             | Supports TTLs           | Supports dead-lettering to other queues     | Optional       | Optional      |
+| **Shovel Queue**     | Moves (or "shovels") messages from one broker to another or between RabbitMQ clusters.         | Use in federated RabbitMQ setups                  | Dependent on source/destination queues | Depends on source queue  | Depends on source/destination queue  | Depends on source queue                   | No             | No            |
+| **Dead Letter Queue**| A special type of queue where messages are sent if they are rejected or reach TTL or max retries | Handling failed or expired messages              | Dependent on source queue | FIFO                             | Supports TTLs           | Itself a dead-letter queue                  | No             | No            |
+
+### Key Details:
+- **Durability**: Whether the queue survives RabbitMQ broker restarts.
+- **Message Ordering**: Describes how messages are consumed from the queue.
+- **TTL**: Determines how long messages are allowed to live in the queue before being discarded.
+- **Dead-Lettering**: The process of redirecting undelivered or rejected messages to another queue.
+- **Auto Delete**: The queue will be automatically deleted when it’s no longer in use.
+- **Exclusive**: The queue is accessible only to the connection that created it.
+
 
 
 
